@@ -1,4 +1,4 @@
-# sip-video-player
+# pip-video-player
 
 Firsty's copy of the official Flutter [`video_player`](https://pub.dev/packages/video_player)
 packages, with picture-in-picture (PiP) added for iOS.
@@ -35,19 +35,19 @@ must only be called on iOS.
 dependencies:
   video_player:
     git:
-      url: git@github.com:Bambooconnected/sip-video-player.git
+      url: git@github.com:Bambooconnected/pip-video-player.git
       path: packages/video_player
       ref: <commit>
 
 dependency_overrides:
   video_player_avfoundation:
     git:
-      url: git@github.com:Bambooconnected/sip-video-player.git
+      url: git@github.com:Bambooconnected/pip-video-player.git
       path: packages/video_player_avfoundation
       ref: <commit>
   video_player_platform_interface:
     git:
-      url: git@github.com:Bambooconnected/sip-video-player.git
+      url: git@github.com:Bambooconnected/pip-video-player.git
       path: packages/video_player_platform_interface
       ref: <commit>
 ```
