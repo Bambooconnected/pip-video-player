@@ -90,7 +90,35 @@ public final class VideoPlayerPlugin: NSObject, FlutterPlugin, AVFoundationVideo
     registrar.register(factory, withId: "plugins.flutter.dev/video_player_ios")
 
     AVFoundationVideoPlayerApiSetup.setUp(binaryMessenger: messenger, api: instance)
+
+    #if os(iOS)
+      registrar.addMethodCallDelegate(
+        instance,
+        channel: FlutterMethodChannel(
+          name: "flutter.io/videoPlayer/pictureInPicture", binaryMessenger: messenger))
+    #endif
   }
+
+  #if os(iOS)
+    public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
+      guard let playerId = call.arguments as? Int64,
+        let player = playersByIdentifier[playerId] as? FVPTextureBasedVideoPlayer
+      else {
+        result(nil)
+        return
+      }
+      switch call.method {
+      case "start":
+        player.startPictureInPicture()
+      case "stop":
+        player.stopPictureInPicture()
+      default:
+        result(FlutterMethodNotImplemented)
+        return
+      }
+      result(nil)
+    }
+  #endif
 
   convenience init(registrar: FlutterPluginRegistrar) {
     #if os(iOS)

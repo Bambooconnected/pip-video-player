@@ -5,7 +5,14 @@
 #import "./include/video_player_avfoundation_objc/FVPTextureBasedVideoPlayer.h"
 #import "./include/video_player_avfoundation_objc/FVPTextureBasedVideoPlayer_Test.h"
 
+#if TARGET_OS_IOS
+@import AVKit;
+#endif
+
 @interface FVPTextureBasedVideoPlayer ()
+#if TARGET_OS_IOS
+@property(nonatomic, nullable) AVPictureInPictureController *pictureInPictureController;
+#endif
 // The updater that drives callbacks to the engine to indicate that a new frame is ready.
 @property(nonatomic) FVPFrameUpdater *frameUpdater;
 // The display link that drives frameUpdater.
@@ -60,9 +67,30 @@
     CALayer *flutterLayer = viewProvider.view.layer;
 #endif
     [flutterLayer addSublayer:self.playerLayer];
+
+#if TARGET_OS_IOS
+    if (AVPictureInPictureController.isPictureInPictureSupported) {
+      _pictureInPictureController =
+          [[AVPictureInPictureController alloc] initWithPlayerLayer:self.playerLayer];
+    }
+#endif
   }
   return self;
 }
+
+#if TARGET_OS_IOS
+- (void)startPictureInPicture {
+  if (!self.pictureInPictureController.isPictureInPictureActive) {
+    [self.pictureInPictureController startPictureInPicture];
+  }
+}
+
+- (void)stopPictureInPicture {
+  if (self.pictureInPictureController.isPictureInPictureActive) {
+    [self.pictureInPictureController stopPictureInPicture];
+  }
+}
+#endif
 
 - (void)dealloc {
   CVBufferRelease(_latestPixelBuffer);

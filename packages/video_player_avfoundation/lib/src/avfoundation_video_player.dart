@@ -11,6 +11,10 @@ import 'package:video_player_platform_interface/video_player_platform_interface.
 import 'video_player_instance_messages.g.dart';
 import 'video_player_plugin_messages.g.dart';
 
+const MethodChannel _pictureInPictureChannel = MethodChannel(
+  'flutter.io/videoPlayer/pictureInPicture',
+);
+
 /// The non-test implementation of `_apiProvider`.
 VideoPlayerInstanceApi _productionApiProvider(int playerId) {
   return VideoPlayerInstanceApi(messageChannelSuffix: playerId.toString());
@@ -291,6 +295,16 @@ class AVFoundationVideoPlayer extends VideoPlayerPlatform {
   bool isVideoTrackSupportAvailable() {
     // iOS with AVFoundation supports video track selection
     return true;
+  }
+
+  @override
+  Future<void> startPictureInPicture(int playerId) {
+    return _pictureInPictureChannel.invokeMethod<void>('start', playerId);
+  }
+
+  @override
+  Future<void> stopPictureInPicture(int playerId) {
+    return _pictureInPictureChannel.invokeMethod<void>('stop', playerId);
   }
 
   @override

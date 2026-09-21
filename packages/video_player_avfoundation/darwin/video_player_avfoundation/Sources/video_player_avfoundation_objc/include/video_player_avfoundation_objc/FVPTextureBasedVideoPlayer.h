@@ -28,6 +28,11 @@ NS_ASSUME_NONNULL_BEGIN
 /// Sets the texture Identifier for the frame updater. This method should be called once the texture
 /// identifier is obtained from the texture registry.
 - (void)setTextureIdentifier:(int64_t)textureIdentifier;
+
+#if TARGET_OS_IOS
+- (void)startPictureInPicture;
+- (void)stopPictureInPicture;
+#endif
 @end
 
 NS_ASSUME_NONNULL_END

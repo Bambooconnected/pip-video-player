@@ -195,6 +195,16 @@ abstract class VideoPlayerPlatform extends PlatformInterface {
   bool isVideoTrackSupportAvailable() {
     return false;
   }
+
+  /// Starts picture-in-picture for the video. Only implemented on iOS.
+  Future<void> startPictureInPicture(int playerId) {
+    throw UnimplementedError('startPictureInPicture() has not been implemented.');
+  }
+
+  /// Stops picture-in-picture for the video. Only implemented on iOS.
+  Future<void> stopPictureInPicture(int playerId) {
+    throw UnimplementedError('stopPictureInPicture() has not been implemented.');
+  }
 }
 
 class _PlaceholderImplementation extends VideoPlayerPlatform {}

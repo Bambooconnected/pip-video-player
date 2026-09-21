@@ -1124,6 +1124,24 @@ class VideoPlayerController extends ValueNotifier<VideoPlayerValue> {
   bool isVideoTrackSupportAvailable() {
     return _videoPlayerPlatform.isVideoTrackSupportAvailable();
   }
+
+  /// Starts picture-in-picture. Only implemented on iOS; does nothing before
+  /// the video is initialized.
+  Future<void> startPictureInPicture() async {
+    if (_isDisposedOrNotInitialized) {
+      return;
+    }
+    await _videoPlayerPlatform.startPictureInPicture(_playerId);
+  }
+
+  /// Stops picture-in-picture. Only implemented on iOS; does nothing before
+  /// the video is initialized.
+  Future<void> stopPictureInPicture() async {
+    if (_isDisposedOrNotInitialized) {
+      return;
+    }
+    await _videoPlayerPlatform.stopPictureInPicture(_playerId);
+  }
 }
 
 class _VideoAppLifeCycleObserver extends Object with WidgetsBindingObserver {
