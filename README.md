@@ -57,7 +57,7 @@ Pin `ref` to a commit, not a branch, so a push here never changes an app build b
 ## Upgrading to a new upstream release
 
 1. Replace the package folders with the new release tags from
-   [flutter/packages](https://github.com/flutter/packages) (without `example/`) and commit that
+   [flutter/packages](https://github.com/flutter/packages) (without `example/` and `doc/`) and commit that
    as an unmodified import.
 2. Reapply the PiP commit on top and resolve conflicts.
 3. Update the release table above.
