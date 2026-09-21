@@ -9,9 +9,12 @@
 @import AVKit;
 #endif
 
-@interface FVPTextureBasedVideoPlayer ()
 #if TARGET_OS_IOS
+@interface FVPTextureBasedVideoPlayer () <AVPictureInPictureControllerDelegate>
 @property(nonatomic, nullable) AVPictureInPictureController *pictureInPictureController;
+@property(nonatomic, copy, nullable) void (^pictureInPictureStartCompletion)(void);
+#else
+@interface FVPTextureBasedVideoPlayer ()
 #endif
 // The updater that drives callbacks to the engine to indicate that a new frame is ready.
 @property(nonatomic) FVPFrameUpdater *frameUpdater;
@@ -72,6 +75,7 @@
     if (AVPictureInPictureController.isPictureInPictureSupported) {
       _pictureInPictureController =
           [[AVPictureInPictureController alloc] initWithPlayerLayer:self.playerLayer];
+      _pictureInPictureController.delegate = self;
     }
 #endif
   }
@@ -79,16 +83,49 @@
 }
 
 #if TARGET_OS_IOS
-- (void)startPictureInPicture {
-  if (!self.pictureInPictureController.isPictureInPictureActive) {
-    [self.pictureInPictureController startPictureInPicture];
+- (void)finishPictureInPictureStart {
+  void (^completion)(void) = self.pictureInPictureStartCompletion;
+  self.pictureInPictureStartCompletion = nil;
+  if (completion) {
+    completion();
   }
+}
+
+- (void)startPictureInPictureWithCompletion:(void (^)(void))completion {
+  [self finishPictureInPictureStart];
+  AVPictureInPictureController *controller = self.pictureInPictureController;
+  if (!controller || controller.isPictureInPictureActive) {
+    completion();
+    return;
+  }
+
+  void (^pending)(void) = [completion copy];
+  self.pictureInPictureStartCompletion = pending;
+  [controller startPictureInPicture];
+
+  __weak typeof(self) weakSelf = self;
+  dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(3 * NSEC_PER_SEC)),
+                 dispatch_get_main_queue(), ^{
+                   if (weakSelf.pictureInPictureStartCompletion == pending) {
+                     [weakSelf finishPictureInPictureStart];
+                   }
+                 });
 }
 
 - (void)stopPictureInPicture {
   if (self.pictureInPictureController.isPictureInPictureActive) {
     [self.pictureInPictureController stopPictureInPicture];
   }
+}
+
+- (void)pictureInPictureControllerDidStartPictureInPicture:
+    (AVPictureInPictureController *)pictureInPictureController {
+  [self finishPictureInPictureStart];
+}
+
+- (void)pictureInPictureController:(AVPictureInPictureController *)pictureInPictureController
+    failedToStartPictureInPictureWithError:(NSError *)error {
+  [self finishPictureInPictureStart];
 }
 #endif
 
@@ -142,6 +179,9 @@
 - (void)disposeWithError:(FlutterError *_Nullable *_Nonnull)error {
   [super disposeWithError:error];
 
+#if TARGET_OS_IOS
+  [self finishPictureInPictureStart];
+#endif
   [self.playerLayer removeFromSuperlayer];
 
   _displayLink.running = NO;

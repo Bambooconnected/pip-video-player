@@ -109,14 +109,13 @@ public final class VideoPlayerPlugin: NSObject, FlutterPlugin, AVFoundationVideo
       }
       switch call.method {
       case "start":
-        player.startPictureInPicture()
+        player.startPictureInPicture(completion: { result(nil) })
       case "stop":
         player.stopPictureInPicture()
+        result(nil)
       default:
         result(FlutterMethodNotImplemented)
-        return
       }
-      result(nil)
     }
   #endif
 

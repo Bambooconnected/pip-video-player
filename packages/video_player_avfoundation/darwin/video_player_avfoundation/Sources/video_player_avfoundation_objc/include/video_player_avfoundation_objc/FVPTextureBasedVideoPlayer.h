@@ -30,7 +30,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)setTextureIdentifier:(int64_t)textureIdentifier;
 
 #if TARGET_OS_IOS
-- (void)startPictureInPicture;
+/// Calls completion once PiP has started or failed to start, or after 3 seconds at most.
+- (void)startPictureInPictureWithCompletion:(void (^)(void))completion;
 - (void)stopPictureInPicture;
 #endif
 @end
